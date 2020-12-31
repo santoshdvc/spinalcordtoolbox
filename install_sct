@@ -13,13 +13,14 @@
 # installation is successful.
 #
 # USAGE
-#   ./install_sct [-h] [-i] [-y] [-c] [-v]
+#   ./install_sct [-h] [-i] [-y] [-C] [-v]
 #
 # OPTIONS
 #  -h   Show this help
 #  -i   Install in-place; this is the default when working from git.
 #  -y   Install without interruption with 'yes' as default answer
-#  -c   Clean previous installation (by default, data/ et al. are not redownloaded)
+#  -C   Do not clean previous installation;
+#       This will speed up installation but can cause bugs.
 #  -v   Full verbose
 #
 #
@@ -48,7 +49,7 @@ MACOSSUPPORTED="13"  # Minimum version of macOS 10 supported
 # CLI options
 SCT_INSTALL_TYPE=""
 NONINTERACTIVE=""
-CLEAN=""
+CLEAN="yes"
 NO_DATA_INSTALL=""
 NO_SCT_BIN_INSTALL=""
 
@@ -343,19 +344,17 @@ for arg in "$@"; do
   esac
 done
 
-while getopts ":iycvh" opt; do
+while getopts ":iyCvh" opt; do
   case $opt in
   i)
     SCT_INSTALL_TYPE="in-place"
     ;;
   y)
-    echo " non-interactive mode"
+    print info " non-interactive mode"
     NONINTERACTIVE="yes"
     ;;
-  c)
-    echo " SCT binaries will be re-installed"
-    echo " data directory will be re-installed"
-    CLEAN="yes"
+  C)
+    CLEAN=""
     ;;
   v)
     echo " Full verbose!"
@@ -579,6 +578,8 @@ if [ ! -x "$SCT_DIR/$PYTHON_DIR"/bin/conda ]; then
 
   # Run conda installer
   run bash "$TMP_DIR/miniconda.sh" -p "$SCT_DIR/$PYTHON_DIR" -b -f
+else
+  print info " conda will not be reinstalled"
 fi
 
 # activate miniconda
@@ -588,6 +589,8 @@ source python/etc/profile.d/conda.sh
 if ! ( conda info -e | cut -f 1 -d ' ' | grep venv_sct >/dev/null ); then
   # create py3.6 venv (for Keras/TF compatibility with Centos7, see issue #2270)
   "$SCT_DIR/$PYTHON_DIR"/bin/conda create -y -n venv_sct python=3.6
+else
+  print info " venv_sct will not be recreated"
 fi
 
 set +u #disable safeties, for conda is not written to their standard.
@@ -654,6 +657,8 @@ if [ ! -x "${SCT_DIR}/${BIN_DIR}/isct_antsSliceRegularizedRegistration" ]; then
   # this if is a bit hacky but it's the best we've got until we migrate
   # these to a better package management system (one with built in caching)
   run sct_download_data -d "binaries_${OS}" -o "${SCT_DIR}/${BIN_DIR}" -k
+else
+  print info " SCT binaries will not be reinstalled"
 fi
 
 print info "All requirements installed!"
@@ -668,6 +673,8 @@ run mkdir -p "$SCT_DIR/$DATA_DIR"
 for data in PAM50 gm_model optic_models pmj_models deepseg_sc_models deepseg_gm_models deepseg_lesion_models c2c3_disc_models; do
   if [ ! -d "$SCT_DIR/$DATA_DIR/$data" ]; then
     run sct_download_data -d "$data" -o "$SCT_DIR/$DATA_DIR/$data"
+  else
+    print info " $DATA_DIR/$data will not be reinstalled"
   fi
 done
 
@@ -677,6 +684,8 @@ fi
 if [ ! -d "$SCT_DIR/$DATA_DIR/deepseg_models" ]; then
   print info "Install deep learning models"
   python -c 'import spinalcordtoolbox.deepseg.models; spinalcordtoolbox.deepseg.models.install_default_models()'
+else
+  print info " deepseg models will not be reinstalled"
 fi
 
 
