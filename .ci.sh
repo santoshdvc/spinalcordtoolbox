@@ -9,7 +9,7 @@ set -u            # exit if unset variables used
 shopt -s failglob # error if a glob doesn't find any files, instead of remaining unexpanded
 
 echo Installing SCT
-PIP_PROGRESS_BAR=off ./install_sct -y
+PIP_PROGRESS_BAR=off ./install_sct -y -C
 
 echo *** CHECK PATH ***
 ls -lA bin  # Make sure all binaries and aliases are there
