@@ -504,6 +504,13 @@ Do you agree? [y]es/[n]o: "
   fi
 done
 
+space_regex="[[:space:]]+"
+if [[ $SCT_DIR =~ $space_regex ]]; then
+  die "ERROR: Install directory $SCT_DIR contains spaces.\n\
+       SCT uses conda, which does not permit spaces in installation paths.\n\
+       More details can be found here: https://github.com/ContinuumIO/anaconda-issues/issues/716"
+fi
+
 # update PATH environment?
 add_to_path=""
 while [[ ! "$add_to_path" =~ ^([Yy](es)?|[Nn]o?)$ ]]; do
@@ -535,7 +542,7 @@ else
   die "This variable is not recognized: THE_RC=$THE_RC"
 fi
 
-# Update MPLBACKEND on headless system. See: https://github.com/neuropoly/spinalcordtoolbox/issues/2137
+# Update MPLBACKEND on headless system. See: https://github.com/spinalcordtoolbox/spinalcordtoolbox/issues/2137
 if [[ -z "${MLBACKEND:-}" ]]; then
   export MPLBACKEND=Agg
 fi
@@ -593,8 +600,8 @@ python/bin/conda create -y -n venv_sct python=3.7
 # make sure that there is no conflict with local python install by making venv_sct an isolated environment.
 # workaround for https://github.com/conda/conda/issues/7173
 # see also
-# * https://github.com/neuropoly/spinalcordtoolbox/pull/3067
-# * https://github.com/neuropoly/spinalcordtoolbox/issues/3200
+# * https://github.com/spinalcordtoolbox/spinalcordtoolbox/pull/3067
+# * https://github.com/spinalcordtoolbox/spinalcordtoolbox/issues/3200
 # this needs to be added very early in python's boot process
 # so using sitecustomize.py or even just appending to the file are impossible.
 sed_i 's/^ENABLE_USER_SITE.*$/ENABLE_USER_SITE = False/' "$SCT_DIR/$PYTHON_DIR/envs/venv_sct/lib/python"*"/site.py"
@@ -606,7 +613,7 @@ set +u #disable safeties, for conda is not written to their standard.
 conda activate venv_sct
 set -u # reactivate safeties
 
-# double-check conda activated (it can be glitchy): https://github.com/neuropoly/spinalcordtoolbox/issues/3029
+# double-check conda activated (it can be glitchy): https://github.com/spinalcordtoolbox/spinalcordtoolbox/issues/3029
 EXPECTED_PYTHON="$(realpath "$(command -v python/envs/venv_sct/bin/python)")"
 ACTUAL_PYTHON="$(realpath "$(command -v python)")"
 if [ "$ACTUAL_PYTHON" != "$EXPECTED_PYTHON"  ]; then
