@@ -26,6 +26,7 @@ We provide the following hands-on tutorials for SCT's command-line tools.
    tutorials/spinalcord-smoothing
    tutorials/visualizing-misaligned-cords
    tutorials/image-processing
+   tutorials/batch-processing-of-subjects
 
 .. _completing-the-tutorials-in-sequence:
 
