@@ -5,7 +5,6 @@
 import logging
 
 import numpy as np
-import os
 from spinalcordtoolbox.image import Image
 from spinalcordtoolbox.centerline.core import get_centerline
 
@@ -33,7 +32,7 @@ def get_slices_for_pmj_distance(segmentation, pmj, distance, extent, param_cente
     im_seg.change_orientation('RPI')
     im_pmj = Image(pmj).change_orientation('RPI')
     if not im_seg.data.shape == im_pmj.data.shape:
-        raise RuntimeError(f"segmentation and pmj should be in the same space coordinate.")
+        raise RuntimeError(f'{"segmentation and pmj should be in the same space coordinate."}')
     # Add PMJ label to the segmentation and then extrapolate to obtain a Centerline object defines between the PMJ
     # and the lower end of the centerline.
     im_seg_with_pmj = im_seg.copy()
@@ -80,7 +79,7 @@ def get_slices_for_pmj_distance(segmentation, pmj, distance, extent, param_cente
     mask.change_orientation(native_orientation)
 
     np.savetxt("centerline.csv", arr_ctl, delimiter=",")
-    
+
     # Get corresponding slices
     # TODO: why the "-1"?
     slices = "{}:{}".format(zmin, zmax-1)

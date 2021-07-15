@@ -131,7 +131,6 @@ class QcImage(object):
 
     def listed_seg(self, mask, ax):
         """Create figure with red segmentation. Common scenario."""
-        #mask = mask/mask.max()  # TODO: move when generating smooth centerline
         img = np.ma.masked_equal(mask, 0)
         ax.imshow(img,
                   cmap=color.LinearSegmentedColormap.from_list("", self._seg_colormap),
@@ -779,7 +778,6 @@ def generate_qc(fname_in1, fname_in2=None, fname_seg=None, angle_line=None, args
     qcslice_type = None
     qcslice_operations = None
     qcslice_layout = None
-
 
     # Get QC specifics based on SCT process
     # Axial orientation, switch between two input images
